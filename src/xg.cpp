@@ -674,6 +674,11 @@ void XG::build(map<id_t, string>& node_label,
     // We have one B_s array for every side, but the first 2 numbers for sides
     // are unused. But max node rank is inclusive, so it evens out...
     bs_arrays.resize(max_node_rank() * 2);
+#elif GPBWT_MODE == MODE_DYNAMIC
+    for(size_t i = 0; i < max_node_rank() * 2; i++) {
+        // We need a loop to put in all those separating values
+        bs_single_array.insert(i, BS_SEPARATOR);
+    }
 #endif
 
 #ifdef VERBOSE_DEBUG
@@ -989,6 +994,8 @@ void XG::build(map<id_t, string>& node_label,
         if(store_threads) {
 #endif
         
+        
+#define VERBOSE_DEBUG
             cerr << "validating threads" << endl;
             
             // How many thread orientations are in the index?
@@ -1041,6 +1048,8 @@ void XG::build(map<id_t, string>& node_label,
         cerr << "graph ok" << endl;
     }
 }
+
+#undef VERBOSE_DEBUG
 
 Node XG::node(int64_t id) const {
     Node n;
@@ -1709,6 +1718,7 @@ void to_text(ostream& out, Graph& graph) {
     }
 }
 
+#define VERBOSE_DEBUG
 int64_t XG::where_to(int64_t current_side, int64_t visit_offset, int64_t new_side) const {
     // Given that we were at visit_offset on the current side, where will we be
     // on the new side? 
@@ -1799,6 +1809,7 @@ int64_t XG::where_to(int64_t current_side, int64_t visit_offset, int64_t new_sid
     // threads going there that come via this edge.
     return new_visit_offset;
 }
+#undef VERBOSE_DEBUG
 
 void XG::insert_threads_into_dag(const vector<thread_t>& t) {
 
@@ -2037,6 +2048,7 @@ void XG::insert_threads_into_dag(const vector<thread_t>& t) {
     
 }
 
+#define VERBOSE_DEBUG
 void XG::insert_thread(const thread_t& t) {
     // We're going to insert this thread
     
@@ -2201,15 +2213,13 @@ void XG::insert_thread(const thread_t& t) {
         
     };
     
-    // We need a simple reverse that works only for perfect match paths
-    auto simple_reverse = [&](const thread_t& thread) {
+    // We need a simple reverse function
+    auto thread_reverse = [&](const thread_t& thread) {
         // Make a reversed version
         thread_t reversed;
         
-        // TODO: give it a reversed name or something
-        
-        for(size_t i = thread.size(); i != (size_t) -1; i--) { 
-            // Copy the mappings from back to front, flipping the is_reverse on their positions.
+        for(size_t i = 0; i < thread.size(); i++) { 
+            // Copy the traversals from back to front, flipping the is_rev flag.
             trav_t reversing = thread[thread.size() - 1 - i];
             reversing = make_trav(trav_id(reversing), !trav_is_rev(reversing), trav_rank(reversing));
             reversed.push_back(reversing);
@@ -2222,11 +2232,12 @@ void XG::insert_thread(const thread_t& t) {
     insert_thread_forward(t);
     
     // Insert reverse
-    insert_thread_forward(simple_reverse(t));
+    insert_thread_forward(thread_reverse(t));
     
     // TODO: name annotation
     
 }
+#undef VERBOSE_DEBUG
 
 auto XG::extract_threads() const -> list<thread_t> {
 
@@ -2426,6 +2437,14 @@ void XG::bs_insert(int64_t side, int64_t offset, destination_t value) {
     array_to_expand.insert(offset, 1, value);
 #elif GPBWT_MODE == MODE_DYNAMIC
      // Find the place to put it in the correct side's B_s and insert
+#ifdef VERBOSE_DEBUG
+     cerr << "B array size " << bs_single_array.size() << ":" << endl;
+     for(size_t i = 0; i < bs_single_array.size(); i++) {
+        cerr << "\tB[" << i << "]: " << bs_single_array[i] << endl;
+     }
+     cerr << "Insert at side " << side << " offset " << offset << endl;
+     cerr << "Which is " << (bs_single_array.select(side - 2, BS_SEPARATOR) + 1 + offset) << "/" << bs_single_array.size() << endl;
+#endif
      bs_single_array.insert(bs_single_array.select(side - 2, BS_SEPARATOR) + 1 + offset, value);
 #endif
 }
@@ -2503,6 +2522,7 @@ size_t XG::count_matches(const Path& t) const {
     return count_matches(thread);
 }
 
+#define VERBOSE_DEBUG
 void XG::extend_search(ThreadSearchState& state, const thread_t& t) const {
     
 #ifdef VERBOSE_DEBUG
@@ -2578,6 +2598,7 @@ void XG::extend_search(ThreadSearchState& state, const thread_t& t) const {
         state.current_side = next_side;
     }
 }
+#undef VERBOSE_DEBUG
 
 size_t serialize(XG::rank_select_int_vector& to_serialize, ostream& out,
     sdsl::structure_tree_node* parent, const std::string name) {
