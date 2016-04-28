@@ -357,11 +357,11 @@ int main(int argc, char** argv) {
         for(XG::thread_t& thread : graph->extract_threads()) {
             // Convert to a Path
             Path path;
-            for(XG::ThreadMapping& m : thread) {
+            for(trav_t& m : thread) {
                 // Convert all the mappings
                 Mapping mapping;
-                mapping.mutable_position()->set_node_id(m.node_id);
-                mapping.mutable_position()->set_is_reverse(m.is_reverse);
+                mapping.mutable_position()->set_node_id(trav_id(m));
+                mapping.mutable_position()->set_is_reverse(trav_is_rev(m));
                 
                 *(path.add_mapping()) = mapping;
             }

@@ -164,15 +164,10 @@ public:
 #endif
     
     
-    // We define a thread visit that's much smaller than a Protobuf Mapping.
-    struct ThreadMapping {
-        int64_t node_id;
-        bool is_reverse;
-    };
-    
-    // We define a thread as just a vector of these things, instead of a bulky
-    // Path.
-    using thread_t = vector<ThreadMapping>;
+    // We define a thread as just a vector of trav_t items, which are small,
+    // instead of a bulky Path. We assume they are generally sorted by rank
+    // already.
+    using thread_t = vector<trav_t>;
     
     // Insert a thread. Path name must be unique or empty.
     void insert_thread(const thread_t& t);
