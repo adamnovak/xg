@@ -327,7 +327,7 @@ Mapping XGPath::mapping(size_t offset) const {
     return m;
 }
 
-size_t XG::serialize(ostream& out, sdsl::structure_tree_node* s, std::string name) {
+size_t XG::serialize(ostream& out, sdsl::structure_tree_node* s, std::string name) const {
 
     sdsl::structure_tree_node* child = sdsl::structure_tree::add_child(s, name, sdsl::util::class_name(*this));
     size_t written = 0;
@@ -373,7 +373,7 @@ size_t XG::serialize(ostream& out, sdsl::structure_tree_node* s, std::string nam
     paths_written += pi_iv.serialize(out, paths_child, "path_ids");
     paths_written += sdsl::write_member(paths.size(), out, paths_child, "path_count");    
     for (size_t i = 0; i < paths.size(); i++) {
-        XGPath* path = paths[i];
+        const XGPath* path = paths[i];
         paths_written += path->serialize(out, paths_child, "path:" + path_name(i + 1));
     }
     
@@ -1832,7 +1832,7 @@ int64_t XG::next_path_node_by_id(size_t path_rank, int64_t id) const {
 int64_t XG::prev_path_node_by_id(size_t path_rank, int64_t id) const {
 
     // find our node in the members bit vector of the xgpath
-    XGPath* path = paths[path_rank - 1];
+    const XGPath* path = paths[path_rank - 1];
     size_t node_rank = id_to_rank(id);
     size_t entity_rank = node_rank_as_entity(node_rank);
     // if it's a path member, we're done
@@ -3061,7 +3061,7 @@ void XG::extend_search(ThreadSearchState& state, const thread_t& t) const {
     }
 }
 
-size_t serialize(XG::rank_select_int_vector& to_serialize, ostream& out,
+size_t serialize(const XG::rank_select_int_vector& to_serialize, ostream& out,
     sdsl::structure_tree_node* parent, const std::string name) {
 #if GPBWT_MODE == MODE_SDSL
     // Just delegate to the SDSL code

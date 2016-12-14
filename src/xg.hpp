@@ -94,7 +94,7 @@ public:
     void load(istream& in);
     size_t serialize(std::ostream& out,
                      sdsl::structure_tree_node* v = NULL,
-                     std::string name = "");
+                     std::string name = "") const;
     size_t seq_length;
     size_t node_count;
     size_t edge_count;
@@ -476,7 +476,7 @@ void parse_region(const string& target, string& name, int64_t& start, int64_t& e
 void to_text(ostream& out, Graph& graph);
 
 // Serialize a rank_select_int_vector in an SDSL serialization compatible way. Returns the number of bytes written.
-size_t serialize(XG::rank_select_int_vector& to_serialize, ostream& out,
+size_t serialize(const XG::rank_select_int_vector& to_serialize, ostream& out,
     sdsl::structure_tree_node* parent, const std::string name);
 
 // Deserialize a rank_select_int_vector in an SDSL serialization compatible way.
