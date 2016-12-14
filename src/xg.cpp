@@ -2235,8 +2235,8 @@ void XG::insert_threads_into_dag(const vector<thread_t>& t) {
         // We have to store the fact that we traversed this edge in the specified direction in our succinct storage. 
         
         // Find the edge as it actually appears in the graph.
-        // TODO: make sure it exists.
         Edge canonical = canonicalize(make_edge(node_id, from_start, next_node_id, to_end));
+        assert(has_edge(canonical.from(), canonical.from_start(), canonical.to(), canonical.to_end()));
         
         // We're departing along this edge, so our orientation cares about
         // whether we have to take the edge forward or backward when departing.
