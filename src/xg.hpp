@@ -94,7 +94,7 @@ public:
     void load(istream& in);
     size_t serialize(std::ostream& out,
                      sdsl::structure_tree_node* v = NULL,
-                     std::string name = "");
+                     std::string name = "") const;
     size_t seq_length;
     size_t node_count;
     size_t edge_count;
@@ -121,7 +121,7 @@ public:
     size_t edge_rank_as_entity(const Edge& edge) const;
     // Given an edge which is in the graph in some orientation, return the edge
     // oriented as it actually appears.
-    Edge canonicalize(const Edge& edge);
+    Edge canonicalize(const Edge& edge) const;
     bool entity_is_node(size_t rank) const;
     size_t entity_rank_as_node_rank(size_t rank) const;
     bool has_edge(int64_t id1, bool is_start, int64_t id2, bool is_end) const;
@@ -460,9 +460,9 @@ public:
     void load(istream& in);
     size_t serialize(std::ostream& out,
                      sdsl::structure_tree_node* v = NULL,
-                     std::string name = "");
+                     std::string name = "") const;
     // Get a mapping. Note that the mapping will not have its lengths filled in.
-    Mapping mapping(size_t offset); // 0-based
+    Mapping mapping(size_t offset) const; // 0-based
 };
 
 
@@ -471,7 +471,7 @@ void parse_region(const string& target, string& name, int64_t& start, int64_t& e
 void to_text(ostream& out, Graph& graph);
 
 // Serialize a rank_select_int_vector in an SDSL serialization compatible way. Returns the number of bytes written.
-size_t serialize(XG::rank_select_int_vector& to_serialize, ostream& out,
+size_t serialize(const XG::rank_select_int_vector& to_serialize, ostream& out,
     sdsl::structure_tree_node* parent, const std::string name);
 
 // Deserialize a rank_select_int_vector in an SDSL serialization compatible way.
