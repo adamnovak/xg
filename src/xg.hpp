@@ -158,7 +158,7 @@ public:
     
 #if GPBWT_MODE == MODE_SDSL
     // We keep our strings in instances of this cool wavelet tree.
-    using rank_select_int_vector = sdsl::wt_huff<sdsl::rrr_vector<>>;
+    using rank_select_int_vector = sdsl::wt_rlmn<sdsl::sd_vector<>>;
 #elif GPBWT_MODE == MODE_DYNAMIC
     using rank_select_int_vector = dyn::rle_str;
 #endif
