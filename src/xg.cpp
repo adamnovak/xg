@@ -2689,8 +2689,17 @@ auto XG::extract_threads() const -> list<thread_t> {
                 // What edge of the available edges do we take?
                 int64_t edge_index = bs_get(side, offset);
                 
-                // If we find a separator, we're very broken.
-                assert(edge_index != BS_SEPARATOR);
+                if (edge_index == BS_SEPARATOR) {
+                    // If we find a separator, we're very broken.
+                    
+                    cerr << "[xg] error: Missing edge " << offset << " at side " << side
+                        << " after " << path.size() << " mappings" << endl;
+                    if (!path.empty()) {
+                        cerr << "[xg] error: Error at node" << path.back().node_id << " " << path.back().is_reverse << endl;
+                    }
+                    
+                    assert(edge_index != BS_SEPARATOR);
+                }
                 
                 if(edge_index == BS_NULL) {
                     // Path ends here.
